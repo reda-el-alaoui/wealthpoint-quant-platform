@@ -1,7 +1,6 @@
 #[deprecation]
 #showPyplotGlobalUse = false
 
-
 [theme]
 base                     = "light"
 backgroundColor          = "#FFFFFF"

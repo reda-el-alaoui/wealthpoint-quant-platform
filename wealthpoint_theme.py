@@ -72,7 +72,7 @@ def inject_global_css():
         color: {GREY_900};
       }}
 
-      #MainMenu, footer {{ visibility: hidden; }}
+
       .block-container {{ padding: 1.8rem 2.8rem 3rem 2.8rem; max-width: 1440px; }}
 
       /* ── Sidebar ── */

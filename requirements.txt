@@ -5,3 +5,20 @@ numpy>=1.24.0
 scipy>=1.11.0
 matplotlib>=3.7.0
 seaborn>=0.12.0
+
+# Deck Analyzer v2 — Dependencies
+# Install with: pip install -r requirements.txt
+
+# ── Core ──────────────────────────────────────────────────────
+streamlit>=1.35.0
+anthropic>=0.25.0
+
+# ── Document parsing ──────────────────────────────────────────
+pdfplumber>=0.10.0          # PDF text extraction
+python-pptx>=0.6.23         # PowerPoint (.pptx)
+python-docx>=1.1.0          # Word documents (.docx)
+openpyxl>=3.1.0             # Excel (.xlsx) — primary
+pandas>=2.0.0               # Excel fallback + CSV
+
+# ── PDF generation ────────────────────────────────────────────
+reportlab>=4.1.0            # Two-pager PDF output

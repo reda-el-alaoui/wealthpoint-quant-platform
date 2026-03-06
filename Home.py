@@ -1,13 +1,6 @@
 # =============================================================================
 # WealthPoint — Home.py  (Login + Landing)
 # =============================================================================
-# Point d'entrée unique de la plateforme.
-# - Non authentifié  → page de login
-# - Authentifié      → landing page avec grille des 4 modules
-#
-# Credentials : .streamlit/secrets.toml [users]
-# Fallback démo (retirer en production) si secrets.toml absent.
-# =============================================================================
 
 import streamlit as st
 import time
@@ -38,10 +31,9 @@ def _load_users() -> dict:
     try:
         return dict(st.secrets["users"])
     except Exception:
-        # Fallback demo — retirer en production
         return {
-            "demo":    "wealthpoint2026",
-            "admin":   "wp-admin-2026",
+            "demo": "wealthpoint2026",
+            "admin": "wp-admin-2026",
             "analyst": "quant#2026",
         }
 
@@ -54,8 +46,8 @@ def _do_login(username: str, password: str) -> bool:
     users = _load_users()
     if users.get(username.strip().lower()) == password:
         st.session_state["wp_authenticated"] = True
-        st.session_state["wp_user"]          = username.strip().lower()
-        st.session_state["wp_attempts"]      = 0
+        st.session_state["wp_user"] = username.strip().lower()
+        st.session_state["wp_attempts"] = 0
         return True
     return False
 
@@ -72,52 +64,53 @@ def _do_logout():
 def render_login():
     st.markdown(f"""
     <style>
-      @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=DM+Sans:wght@300;400;500&display=swap');
+      @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=DM+Sans:wght@300;400;500&display=swap');
 
       html, body, [class*="css"] {{
         font-family: 'DM Sans', sans-serif;
         background: linear-gradient(145deg, {PRIMARY_WASH} 0%, #ECE4D8 100%);
         color: {GREY_900};
       }}
-      #MainMenu, footer, header {{ visibility: hidden; }}
-      [data-testid="stSidebar"],
-      [data-testid="collapsedControl"] {{ display: none !important; }}
-      .block-container {{ padding: 0 !important; max-width: 100% !important; }}
 
-      .lw {{
-        min-height: 100vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+      [data-testid="stSidebar"] {{
+        display: none !important;
       }}
-      .lc {{
+
+      .block-container {{
+        max-width: 460px !important;
+        padding-top: 8vh !important;
+        padding-bottom: 0 !important;
+      }}
+
+      .wp-card {{
         background: {WHITE};
         border: 1px solid {PRIMARY_PALE};
         border-top: 4px solid {PRIMARY};
         border-radius: 8px;
-        padding: 2.8rem 2.6rem 2.2rem;
-        width: 100%;
-        max-width: 400px;
+        padding: 2.2rem 2rem 1.6rem;
         box-shadow: 0 8px 36px rgba(140,112,80,0.13);
       }}
-      .ll {{
+
+      .wp-title {{
         font-family: 'Cormorant Garamond', serif;
         font-size: 2.1rem;
         font-weight: 300;
         color: {PRIMARY_DARK};
         letter-spacing: 0.08em;
         text-align: center;
-        margin-bottom: 0.2rem;
+        margin-bottom: 0.15rem;
       }}
-      .lt {{
+
+      .wp-subtitle {{
         font-size: 0.65rem;
         color: {GREY_500};
         letter-spacing: 0.2em;
         text-transform: uppercase;
         text-align: center;
-        margin-bottom: 2rem;
+        margin-bottom: 1.8rem;
       }}
-      .flbl {{
+
+      .wp-label {{
         font-size: 0.7rem;
         letter-spacing: 0.12em;
         text-transform: uppercase;
@@ -125,6 +118,7 @@ def render_login():
         font-weight: 500;
         margin-bottom: 0.25rem;
       }}
+
       [data-testid="stTextInput"] input {{
         border: 1px solid {PRIMARY_PALE} !important;
         border-radius: 3px !important;
@@ -132,12 +126,13 @@ def render_login():
         padding: 0.55rem 0.85rem !important;
         background: {WHITE} !important;
         color: {GREY_900} !important;
-        transition: border-color 0.15s;
       }}
+
       [data-testid="stTextInput"] input:focus {{
         border-color: {PRIMARY} !important;
         box-shadow: 0 0 0 2px rgba(177,144,105,0.15) !important;
       }}
+
       .stButton > button {{
         background: {PRIMARY} !important;
         color: {WHITE} !important;
@@ -149,107 +144,108 @@ def render_login():
         padding: 0.65rem 1.5rem !important;
         width: 100% !important;
         margin-top: 0.5rem !important;
-        transition: background 0.18s !important;
       }}
-      .stButton > button:hover {{ background: {PRIMARY_DARK} !important; }}
-      .al-err {{
-        background: {RED_PALE}; border-left: 3px solid {RED_SOFT};
-        color: {RED_SOFT}; padding: 0.6rem 0.85rem;
-        border-radius: 0 3px 3px 0; font-size: 0.78rem; margin-top: 0.6rem;
+
+      .stButton > button:hover {{
+        background: {PRIMARY_DARK} !important;
       }}
-      .al-ok {{
-        background: {GREEN_PALE}; border-left: 3px solid {GREEN_SOFT};
-        color: {GREEN_SOFT}; padding: 0.6rem 0.85rem;
-        border-radius: 0 3px 3px 0; font-size: 0.78rem; margin-top: 0.6rem;
+
+      .wp-msg {{
+        padding: 0.6rem 0.85rem;
+        border-radius: 0 3px 3px 0;
+        font-size: 0.78rem;
+        margin-top: 0.6rem;
       }}
-      .al-lock {{
-        background: {AMBER_PALE}; border-left: 3px solid {AMBER};
-        color: {AMBER}; padding: 0.55rem 0.85rem;
-        border-radius: 0 3px 3px 0; font-size: 0.75rem; margin-top: 0.6rem;
+
+      .wp-err {{
+        background: {RED_PALE};
+        border-left: 3px solid {RED_SOFT};
+        color: {RED_SOFT};
       }}
-      .demo-b {{
-        background: {PRIMARY_WASH}; border: 1px solid {PRIMARY_PALE};
-        border-radius: 4px; padding: 0.65rem 0.9rem;
-        font-size: 0.72rem; color: {GREY_700}; line-height: 1.85;
-        margin-top: 1.1rem;
+
+      .wp-ok {{
+        background: {GREEN_PALE};
+        border-left: 3px solid {GREEN_SOFT};
+        color: {GREEN_SOFT};
       }}
-      .demo-b code {{
-        font-family: 'Courier New', monospace; color: {PRIMARY_DARK};
-        background: {PRIMARY_PALE}; padding: 0.05rem 0.3rem; border-radius: 2px;
-        font-size: 0.7rem;
+
+      .wp-lock {{
+        background: {AMBER_PALE};
+        border-left: 3px solid {AMBER};
+        color: {AMBER};
       }}
-      .lft {{
-        font-size: 0.63rem; color: {GREY_300}; text-align: center;
-        margin-top: 1.4rem; letter-spacing: 0.07em;
+
+      .wp-footer {{
+        font-size: 0.63rem;
+        color: {GREY_300};
+        text-align: center;
+        margin-top: 1.2rem;
+        letter-spacing: 0.07em;
       }}
     </style>
     """, unsafe_allow_html=True)
 
     if "wp_attempts" not in st.session_state:
         st.session_state.wp_attempts = 0
+
     locked = st.session_state.wp_attempts >= 5
 
-    st.markdown("<div class='lw'>", unsafe_allow_html=True)
-    _, col, _ = st.columns([1, 1.6, 1])
+    st.title(" ")
+    st.title(" ")
+    #st.markdown("<div class='wp-card'>", unsafe_allow_html=True)
+    st.markdown("<div class='wp-title'>◈ WealthPoint</div>", unsafe_allow_html=True)
+    st.markdown("<div class='wp-subtitle'>Analytics Platform · Accès sécurisé</div>", unsafe_allow_html=True)
 
-    with col:
-        st.markdown("""
-        <div class='lc'>
-          <div class='ll'>◈ WealthPoint</div>
-          <div class='lt'>Analytics Platform · Accès sécurisé</div>
-        </div>
-        """, unsafe_allow_html=True)
+    st.markdown("<div class='wp-label'>Identifiant</div>", unsafe_allow_html=True)
+    username = st.text_input(
+        "u",
+        placeholder="Votre identifiant",
+        label_visibility="collapsed",
+        key="lg_user"
+    )
 
-        st.markdown("<div class='flbl'>Identifiant</div>", unsafe_allow_html=True)
-        username = st.text_input("u", placeholder="Votre identifiant",
-                                 label_visibility="collapsed", key="lg_user")
+    st.markdown("<div class='wp-label' style='margin-top:0.85rem;'>Mot de passe</div>", unsafe_allow_html=True)
+    password = st.text_input(
+        "p",
+        placeholder="Votre mot de passe",
+        type="password",
+        label_visibility="collapsed",
+        key="lg_pass"
+    )
 
-        st.markdown("<div class='flbl' style='margin-top:0.85rem;'>Mot de passe</div>",
-                    unsafe_allow_html=True)
-        password = st.text_input("p", placeholder="Votre mot de passe",
-                                 type="password", label_visibility="collapsed",
-                                 key="lg_pass")
+    if locked:
+        st.markdown(
+            "<div class='wp-msg wp-lock'>🔒 Trop de tentatives. Rechargez la page pour réessayer.</div>",
+            unsafe_allow_html=True
+        )
+    else:
+        if st.button("Se connecter", key="lg_btn"):
+            if not username or not password:
+                st.markdown(
+                    "<div class='wp-msg wp-err'>Veuillez saisir votre identifiant et votre mot de passe.</div>",
+                    unsafe_allow_html=True
+                )
+            elif _do_login(username, password):
+                st.markdown(
+                    "<div class='wp-msg wp-ok'>✓ Authentification réussie — redirection…</div>",
+                    unsafe_allow_html=True
+                )
+                time.sleep(0.5)
+                st.rerun()
+            else:
+                st.session_state.wp_attempts += 1
+                rem = 5 - st.session_state.wp_attempts
+                hint = f"Il vous reste {rem} tentative(s)." if rem > 0 else "Session verrouillée."
+                st.markdown(
+                    f"<div class='wp-msg wp-err'>Identifiant ou mot de passe incorrect.<br><span style='opacity:0.8;font-size:0.74rem;'>{hint}</span></div>",
+                    unsafe_allow_html=True
+                )
 
-        if locked:
-            st.markdown("""
-            <div class='al-lock'>
-              🔒 Trop de tentatives. Rechargez la page pour réessayer.
-            </div>""", unsafe_allow_html=True)
-        else:
-            if st.button("Se connecter", key="lg_btn"):
-                if not username or not password:
-                    st.markdown("""
-                    <div class='al-err'>
-                      Veuillez saisir votre identifiant et votre mot de passe.
-                    </div>""", unsafe_allow_html=True)
-                elif _do_login(username, password):
-                    st.markdown("""
-                    <div class='al-ok'>✓ Authentification réussie — redirection…</div>
-                    """, unsafe_allow_html=True)
-                    time.sleep(0.5)
-                    st.rerun()
-                else:
-                    st.session_state.wp_attempts += 1
-                    rem = 5 - st.session_state.wp_attempts
-                    hint = f"Il vous reste {rem} tentative(s)." if rem > 0 else "Session verrouillée."
-                    st.markdown(f"""
-                    <div class='al-err'>
-                      Identifiant ou mot de passe incorrect.<br/>
-                      <span style='opacity:0.8;font-size:0.74rem;'>{hint}</span>
-                    </div>""", unsafe_allow_html=True)
-
-        st.markdown(f"""
-        <div class='demo-b'>
-          <strong>Accès démo</strong><br/>
-          <code>demo</code> / <code>wealthpoint2026</code><br/>
-          <code>admin</code> / <code>wp-admin-2026</code><br/>
-          <code>analyst</code> / <code>quant#2026</code>
-        </div>
-        <div class='lft'>2026 · WealthPoint Analytics · Usage interne uniquement</div>
-        """, unsafe_allow_html=True)
-
+    st.markdown(
+        f"<div class='wp-footer'>2026 · WealthPoint Analytics · Usage interne uniquement</div>",
+        unsafe_allow_html=True
+    )
     st.markdown("</div>", unsafe_allow_html=True)
-
 
 # =============================================================================
 # LANDING PAGE (post-login)
@@ -265,7 +261,7 @@ def render_landing():
         background-color: {WHITE};
         color: {GREY_900};
       }}
-      #MainMenu, footer {{ visibility: hidden; }}
+
       .block-container {{ padding: 2rem 3rem 3rem 3rem; max-width: 1200px; }}
 
       [data-testid="stSidebar"] {{
@@ -284,7 +280,6 @@ def render_landing():
         font-weight: 500 !important; border-left: 3px solid {PRIMARY};
       }}
 
-      /* Module card */
       .mc {{
         background: {WHITE};
         border: 1px solid {PRIMARY_PALE};
@@ -317,7 +312,6 @@ def render_landing():
         letter-spacing: 0.07em; text-transform: uppercase; font-weight: 500;
       }}
 
-      /* Logout button */
       .stButton > button {{
         background: transparent !important;
         color: {GREY_700} !important;
@@ -337,7 +331,6 @@ def render_landing():
     </style>
     """, unsafe_allow_html=True)
 
-    # ── Sidebar
     with st.sidebar:
         st.markdown(f"""
         <div style='padding:0.3rem 0 1rem 0;'>
@@ -358,7 +351,6 @@ def render_landing():
             _do_logout()
             st.rerun()
 
-    # ── Hero
     st.markdown(f"""
     <div style='text-align:center;padding:2.5rem 0 1.4rem 0;'>
       <div style='font-family:Cormorant Garamond,serif;font-size:3rem;font-weight:300;
@@ -373,8 +365,8 @@ def render_landing():
     <div style='border-top:1px solid {PRIMARY_PALE};margin:0 auto 2.5rem auto;width:50%;'></div>
     """, unsafe_allow_html=True)
 
-    # ── 2×2 module grid
     r1c1, r1c2 = st.columns(2, gap="medium")
+    st.text("")
     r2c1, r2c2 = st.columns(2, gap="medium")
 
     with r1c1:
@@ -445,7 +437,6 @@ def render_landing():
         </a>
         """, unsafe_allow_html=True)
 
-    # ── Footer
     st.markdown(f"""
     <div style='text-align:center;margin-top:3rem;font-size:0.7rem;
                 color:{GREY_300};letter-spacing:0.08em;'>
