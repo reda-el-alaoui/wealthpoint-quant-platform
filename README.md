@@ -396,3 +396,4 @@ else:
 ---
 
 *2026 · WealthPoint Analytics Platform · Ingénierie Quantitative*
+# wealthpoint-quant-platform
